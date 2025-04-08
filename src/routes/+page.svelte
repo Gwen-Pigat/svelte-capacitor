@@ -25,17 +25,24 @@
 
 
 <h1>Tasks Loader</h1>
-{#if addTask}
-    <TaskAdd bind:addTask />
-{:else}
-    <button type="button" onclick={() => addTask = !addTask}>Add task</button>
-{/if}
+<TaskAdd />
 {#if $tasks.length > 0}
-    <div id="tasks">
-        {#each $tasks as task}
-            <Task {task} />
-        {/each}
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Date add</th>
+                <th scope="col">Date done</th>
+                <th scope="col">Is done</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {#each $tasks as task}
+                <Task {task} />
+            {/each}
+        </tbody>
+    </table>
 {:else}
     <p>No tasks available.</p>
 {/if}

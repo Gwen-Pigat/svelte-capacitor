@@ -1,10 +1,8 @@
 <script lang="ts">
     import { tasks } from "$lib";
 
-
-    export let addTask:boolean
-
     let form:HTMLFormElement
+    let title:string = ""
 
     async function submitTask(data:any):Promise<void>{
         data.preventDefault()
@@ -17,14 +15,13 @@
             console.error(result.error)
             return
         }
+        title = ""
         tasks.set(result.tasks)
     }
 
 </script>
 
-<button type="button" onclick={() => addTask = !addTask}>Retour</button>
-
 <form id="setTask" method="POST" onsubmit={submitTask} bind:this={form}>
-    <input type="text" name="title" placeholder="Titre de la tâche" />
-    <button type="submit">Valid</button>
+    <input type="text" name="title" placeholder="Titre de la tâche" bind:value={title} />
+    <button type="submit" disabled={title === ""}>Valid</button>
 </form>

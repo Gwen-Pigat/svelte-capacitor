@@ -16,7 +16,10 @@ export async function POST(event):Promise<Response>{
         error(400, "Wrong request")
     }
     try{
-        await pool.execute('INSERT INTO tasks(title) VALUES(?)', [post.get("title")])
+        await pool.execute(
+            'INSERT INTO tasks(title,date_add) VALUES(?,?)', 
+            [post.get("title"), new Date()]
+        )
     }catch(err:any){
         error(400, err.message)
     }
