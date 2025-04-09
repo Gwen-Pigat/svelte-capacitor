@@ -1,3 +1,5 @@
+export const prerender = true
+
 import pool from '$lib/server/db'
 import { json } from '@sveltejs/kit'
 
