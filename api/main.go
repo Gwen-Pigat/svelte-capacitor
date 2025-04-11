@@ -7,7 +7,6 @@ import (
 	"mobile-api/initializers"
 	"net/http"
 	"os"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -37,7 +36,8 @@ func main() {
 		port = os.Getenv("PORT")
 	}
 	GET("/", Index)
-	POST("/task", CreateTask)
+	POST("/tasks", CreateTask)
+	GET("/tasks", GetTasks)
 	http.ListenAndServe(":"+port, nil)
 }
 
@@ -113,12 +113,6 @@ func NewWrapper(w http.ResponseWriter, r *http.Request) *Wrapper {
 	}
 }
 
-func Index(wrapper *Wrapper) {
-	wrapper.Render(map[string]interface{}{
-		"message": "Hello world",
-	})
-}
-
 func (wrapper *Wrapper) wrapData(data string) error {
 	if wrapper.data[data] == nil || wrapper.data[data] == "" {
 		return fmt.Errorf("you have to set a value for %v", data)
@@ -126,46 +120,8 @@ func (wrapper *Wrapper) wrapData(data string) error {
 	return nil
 }
 
-type Task struct {
-	ID      int       `json:"id"`
-	Title   string    `json:"title"`
-	DateAdd time.Time `json:"dateAdd"`
-	DateTo  time.Time `json:"dateTo"`
-	Content string    `json:"content"`
-	IsDone  bool      `json:"isDone"`
-}
-
-func CreateTask(wrapper *Wrapper) {
-	fmt.Printf("Db value is %v", db)
-	if err := wrapper.wrapData("title"); err != nil {
-		wrapper.Error(err.Error())
-		return
-	}
-	task := Task{
-		Title:   wrapper.data["title"].(string),
-		DateAdd: time.Now().UTC().Truncate(time.Second),
-		IsDone:  false,
-	}
-
-	smtp, err := db.Prepare("INSERT INTO tasks(title,date_add,is_done) VALUES(?,?,?)")
-	if err != nil {
-		wrapper.Error(err.Error(), 400)
-		return
-	}
-	defer smtp.Close()
-	result, err := smtp.Exec(task.Title, task.DateAdd, task.IsDone)
-	if err != nil {
-		wrapper.Error(err.Error(), 400)
-		return
-	}
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		wrapper.Error(err.Error(), 400)
-		return
-	}
-	task.ID = int(lastInsertID)
-
+func Index(wrapper *Wrapper) {
 	wrapper.Render(map[string]interface{}{
-		"task": task,
-	}, 200)
+		"message": "Hello world",
+	})
 }
