@@ -1,0 +1,11 @@
+
+:root{
+    --white: #ffffff;
+    --red: #ff0000;
+}
+
+button.action{
+    position: absolute;
+    top:0;
+    right:0;
+}

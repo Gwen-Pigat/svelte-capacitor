@@ -1,51 +1,47 @@
 <script lang="ts">
     import { tasks } from "$lib";
+    import { fetchAPI } from "$lib/_core";
     import { onMount } from "svelte";
 
     let { task } = $props()
 
 
-    async function loadData(){
-        const data = await fetch(`/api/tasks/${task.id}`, {
-            method: "PATCH"
-        })
-        const response = await data.json()
-        if(response.error){
-            console.error(response.error)
+    async function patchTask(){
+        const data = await fetchAPI(`/tasks/${task.id}`, "PATCH")
+        if(data.error){
+            return
         }
-        task = response.task
+        task = data.result
+        console.log(task, data)
     }
 
     async function removeTask(){
-        const data = await fetch(`/api/tasks/${task.id}`, {
-            method: "DELETE"
-        })
-        const response = await data.json()
-        if(response.error){
-            console.error(response.error)
+        const data = await fetchAPI(`/tasks/${task.id}`, "DELETE")
+        if(data.error){
+            return
         }
-        tasks.update((list: { id: string; is_done: boolean; title: string }[]) => list.filter((t) => t.id !== task.id))
+        tasks.update((list: { id: string; isDone: boolean; title: string }[]) => list.filter((t) => t.id !== task.id))
     }
 
     let dateTo:Date
     let dateToFormat:string = $state("")
 
-    function dateFormat(date:Date){
-        dateTo = new Date(task.date_to)
+    function dateFormat(){
+        dateTo = new Date(task.dateTo)
         dateToFormat = dateTo.getDate()+"/"+dateTo.getMonth()+"/"+dateTo.getFullYear()+" "+dateTo.getHours()+":"+dateTo.getMinutes()
     }
 
-    const dateAdd = new Date(task.date_add)
+    const dateAdd = new Date(task.dateAdd)
     const dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()
 
 
     $effect(() => {
-        dateFormat(task.date_to)
+        dateFormat()
     })
 
     onMount(() => {
-        if(task.date_to !== null){
-            dateFormat(task.date_to)
+        if(task.dateTo !== ""){
+            dateFormat()
         }
     })
 
@@ -54,11 +50,11 @@
 <tr>
     <th scope="row">{task.title}</th>
     <td>{dateAddFormat}</td>
-    <td>{#if task.date_to !== null}{dateToFormat}{/if}</td>
+    <td>{#if task.dateTo !== ""}{dateToFormat}{/if}</td>
     <td>
         <input type="checkbox" 
-        bind:checked={task.is_done} 
-        onchange={loadData} />
+        bind:checked={task.isDone} 
+        onchange={patchTask} />
     </td>
     <td>
         <button class="outline secondary" onclick={removeTask}>X</button>

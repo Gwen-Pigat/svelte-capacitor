@@ -1,80 +1,52 @@
 <script lang="ts">
-    import Task from '$lib/components/Task.svelte';
-    import TaskAdd from '$lib/components/TaskAdd.svelte';
-    import { tasks } from '$lib';
-
     import { onMount } from 'svelte';
-
-    let user:any
+    import { fetchAPI } from '$lib/_core';
+    import { user,error } from '$lib'
+    import Tasks from '$lib/components/Tasks.svelte';
+    import User from '$lib/components/User.svelte';
+    import { fade } from 'svelte/transition';
 
     async function loadUser(){
-        const data = await fetch("/api/auth")
-        const result = await data.json()
-        if(!data.ok){
+        const data = await fetchAPI("/user","GET")
+        if(data.error){
             return
         }
-        if(result.user){
-            user = result.user
-            loadData()
-        }
-    }
-
-    async function loadData(){
-        const data = await fetch("/api/tasks")
-        tasks.set(await data.json())
-        console.log($tasks.length)
-    }
-
-    async function connectUser(data:any){
-        data.preventDefault()
-        const dataFetch = await fetch("/api/auth", {
-            method: "POST",
-            body: new FormData(data.currentTarget)
-        })
-
-        const result = await dataFetch.json()
-        if(!dataFetch.ok){
-            console.error(result.error)
-            return
-        }
-        user = result.user
-        console.log("Response cookies", result, user)
+        user.set(data)
     }
 
     onMount(() => {
         loadUser()
     })
 
+    $effect(() => {
+        if($error !== ""){
+            setTimeout(function(){
+                error.set("")
+            },6000)
+        }
+    })
+
 </script>
 
-
-{#if !user}
-    <h1>Connect</h1>
-    <form id="setConnect" onsubmit={connectUser}>
-        <input type="text" placeholder="Votre nom" name="user" />
-        <button type="submit">Connect</button>
-    </form>
-{:else}
-    <h1>Tasks Loader</h1>
-    <TaskAdd />
-    {#if $tasks.length > 0}
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Date add</th>
-                    <th scope="col">Date done</th>
-                    <th scope="col">Is done</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each $tasks as task}
-                    <Task {task} />
-                {/each}
-            </tbody>
-        </table>
-    {:else}
-        <p>No tasks available.</p>
-    {/if}
+{#if $error !== ""}
+    <div class="error" transition:fade={{duration:500}}>{$error}</div>
 {/if}
+{#if !$user.id}
+    <User />
+{:else}
+    <Tasks />
+{/if}
+
+<style>
+    .error{
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 16px;
+        padding: 0.5rem;
+        border-radius: 0;
+        color: var(--white);
+        background-color: var(--red);
+        z-index: 10000;
+    }
+</style>

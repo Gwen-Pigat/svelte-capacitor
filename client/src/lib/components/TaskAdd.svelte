@@ -1,22 +1,19 @@
 <script lang="ts">
     import { tasks } from "$lib";
+    import { fetchAPI } from "$lib/_core";
 
     let form:HTMLFormElement
     let title:string = ""
 
     async function submitTask(data:any):Promise<void>{
         data.preventDefault()
-        const response = await fetch("/api/tasks", {
-            method: "POST",
-            body: new FormData(form)
-        })
-        const result = await response.json()
-        if(!response.ok){
-            console.error(result.error)
+        const response = await fetchAPI("/tasks", "POST", new FormData(form))
+        if(response.error){
+            console.error(response.error)
             return
         }
         title = ""
-        tasks.set(result.tasks)
+        tasks.set(response)
     }
 
 </script>
