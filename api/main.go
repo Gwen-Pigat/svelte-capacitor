@@ -46,9 +46,11 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+	Handle(r, http.MethodPost, "/user/connect", GetUserConnect)
 	Handle(r, http.MethodPost, "/user", CreateUser)
 	r.Group(func(r chi.Router) {
 		r.Use(CheckAuth)
+		Handle(r, http.MethodGet, "/user", GetUser)	
 		Handle(r, http.MethodGet, "/tasks", GetTasks)
 		Handle(r, http.MethodPost, "/tasks", CreateTask)
 		Handle(r, http.MethodPatch, "/tasks/{id}", PatchTask)

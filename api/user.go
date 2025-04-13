@@ -18,8 +18,58 @@ type User struct {
 }
 
 var userSetup = map[string]string{
-	"payload": "id,username,date_add,is_active",
+	"payload": "id,username,date_add,is_active,token",
 	"table":   "user",
+}
+
+func GetUser(wrapper *Wrapper) {
+	rows, err := db.Query("SELECT "+userSetup["payload"]+" FROM "+userSetup["table"]+" WHERE id=?", wrapper.ReturnUser())
+	if err != nil {
+		wrapper.Error(err.Error())
+		return
+	}
+	defer rows.Close()
+	var user User
+	for rows.Next() {
+		if err := rows.Scan(&user.ID, &user.Username, &user.DateAdd, &user.IsActive, &user.Token); err != nil {
+			wrapper.Error(err.Error())
+			return
+		}
+	}
+	if user.ID == 0 {
+		wrapper.Error("User cannot be found", http.StatusNotFound)
+		return
+	}
+	wrapper.Render(map[string]any{
+		"data": user,
+	})
+}
+
+func GetUserConnect(wrapper *Wrapper) {
+	if err := wrapper.wrapData("username"); err != nil {
+		wrapper.Error("You have to set the username")
+		return
+	}
+	rows, err := db.Query("SELECT "+userSetup["payload"]+" FROM "+userSetup["table"]+" WHERE username=?", wrapper.data["username"])
+	if err != nil {
+		wrapper.Error(err.Error())
+		return
+	}
+	defer rows.Close()
+	var user User
+	for rows.Next() {
+		if err := rows.Scan(&user.ID, &user.Username, &user.DateAdd, &user.IsActive, &user.Token); err != nil {
+			wrapper.Error(err.Error())
+			return
+		}
+	}
+	if user.ID == 0 {
+		wrapper.Error("User cannot be found", http.StatusNotFound)
+		return
+	}
+	wrapper.Render(map[string]any{
+		"data": user,
+	})
 }
 
 func GetUserAuth(wrapper *Wrapper) (userID int, error error) {
