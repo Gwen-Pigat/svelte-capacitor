@@ -41,7 +41,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("API_URL")},
-		AllowedMethods:   []string{"GET", "POST", "PATCH", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "OPTIONS", "DELETE"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -50,10 +50,11 @@ func main() {
 	Handle(r, http.MethodPost, "/user", CreateUser)
 	r.Group(func(r chi.Router) {
 		r.Use(CheckAuth)
-		Handle(r, http.MethodGet, "/user", GetUser)	
+		Handle(r, http.MethodGet, "/user", GetUser)
 		Handle(r, http.MethodGet, "/tasks", GetTasks)
 		Handle(r, http.MethodPost, "/tasks", CreateTask)
 		Handle(r, http.MethodPatch, "/tasks/{id}", PatchTask)
+		Handle(r, http.MethodDelete, "/tasks/{id}", DeleteTask)
 	})
 	http.ListenAndServe(":"+port, r)
 }

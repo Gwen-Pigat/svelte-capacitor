@@ -47,7 +47,7 @@ func GetUser(wrapper *Wrapper) {
 
 func GetUserConnect(wrapper *Wrapper) {
 	if err := wrapper.wrapData("username"); err != nil {
-		wrapper.Error("You have to set the username")
+		wrapper.Error("You have to send the username")
 		return
 	}
 	rows, err := db.Query("SELECT "+userSetup["payload"]+" FROM "+userSetup["table"]+" WHERE username=?", wrapper.data["username"])
@@ -84,7 +84,7 @@ func GetUserAuth(wrapper *Wrapper) (userID int, error error) {
 	defer rows.Close()
 	var user User
 	for rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Username, &user.DateAdd, &user.IsActive); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.DateAdd, &user.IsActive, &user.Token); err != nil {
 			return 0, err
 		}
 	}

@@ -41,21 +41,12 @@ func CreateTask(wrapper *Wrapper) {
 		return
 	}
 	defer smtp.Close()
-	result, err := smtp.Exec(task.Title, task.DateAdd, task.IsDone, task.RefUser)
+	_, err = smtp.Exec(task.Title, task.DateAdd, task.IsDone, task.RefUser)
 	if err != nil {
 		wrapper.Error(err.Error(), 400)
 		return
 	}
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		wrapper.Error(err.Error(), 400)
-		return
-	}
-	task.ID = int(lastInsertID)
-
-	wrapper.Render(map[string]any{
-		"data": task,
-	}, 200)
+	GetTasks(wrapper)
 }
 
 func GetTasks(wrapper *Wrapper) {
@@ -81,8 +72,7 @@ func GetTasks(wrapper *Wrapper) {
 	}, 200)
 }
 
-func GetTask(w http.ResponseWriter, r *http.Request) {
-	wrapper := NewWrapper(w, r)
+func GetTask(wrapper *Wrapper) {
 	rows, err := db.Query("SELECT "+taskSetup["payload"]+" FROM "+taskSetup["table"]+" WHERE id=? ORDER BY date_add DESC", chi.URLParam(wrapper.request, "id"))
 	if err != nil {
 		wrapper.Error(err.Error(), http.StatusInternalServerError)
@@ -104,9 +94,29 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func PatchTask(wrapper *Wrapper) {
-	rows, err := db.Query(
-		"UPDATE "+taskSetup["table"]+" SET is_done = NOT is_done WHERE id=? AND ref_user=?",
-		chi.URLParam(wrapper.request, "id"), wrapper.ReturnUser(),
+	rows, err := db.Query("SELECT "+taskSetup["payload"]+" FROM "+taskSetup["table"]+" WHERE id=? ORDER BY date_add DESC", chi.URLParam(wrapper.request, "id"))
+	if err != nil {
+		wrapper.Error(err.Error(), http.StatusInternalServerError)
+		return
+	}
+	task := Task{}
+	for rows.Next() {
+		if err := rows.Scan(&task.ID, &task.DateAdd, &task.DateTo, &task.Title, &task.Content, &task.IsDone, &task.RefUser); err != nil {
+			wrapper.Error(err.Error(), http.StatusBadGateway)
+			return
+		}
+		if task.DateTo == "0000-00-00 00:00:00" {
+			task.DateTo = ""
+		}
+	}
+	task.DateTo = time.Now().UTC().Truncate(time.Second).String()
+	if task.IsDone {
+		task.DateTo = ""
+	}
+	task.IsDone = !task.IsDone
+	rows, err = db.Query(
+		"UPDATE "+taskSetup["table"]+" SET is_done = ?,date_to=? WHERE id=? AND ref_user=?",
+		task.IsDone, task.DateTo, chi.URLParam(wrapper.request, "id"), wrapper.ReturnUser(),
 	)
 	if err != nil {
 		wrapper.Error(err.Error(), http.StatusBadRequest)
@@ -115,5 +125,24 @@ func PatchTask(wrapper *Wrapper) {
 	defer rows.Close()
 	wrapper.Render(map[string]any{
 		"message": "Update successfull",
+		"result":  task,
+	})
+}
+
+func DeleteTask(wrapper *Wrapper) {
+	rows, err := db.Exec(
+		"DELETE FROM "+taskSetup["table"]+" WHERE id=? AND ref_user=?",
+		chi.URLParam(wrapper.request, "id"), wrapper.ReturnUser(),
+	)
+	if err != nil {
+		wrapper.Error(err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, err := rows.RowsAffected(); err != nil {
+		wrapper.Error(err.Error(), http.StatusBadRequest)
+		return
+	}
+	wrapper.Render(map[string]any{
+		"message": "Delete successfull",
 	})
 }
