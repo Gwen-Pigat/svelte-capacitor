@@ -40,7 +40,7 @@ func main() {
 	}
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{os.Getenv("API_URL")},
+		AllowedOrigins:   []string{os.Getenv("API_URL_PREPROD"), os.Getenv("API_URL_PROD")},
 		AllowedMethods:   []string{"GET", "POST", "PATCH", "OPTIONS", "DELETE"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-type", "X-CSRF-Token"},
 		AllowCredentials: false,
