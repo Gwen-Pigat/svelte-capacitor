@@ -8,11 +8,14 @@
 
     async function loadUser(){
         const data = await fetchAPI("/user","GET")
+        userConnect = true
         if(data.error){
             return
         }
         user.set(data)
     }
+
+    let userConnect:boolean = $state(false)
 
     onMount(() => {
         loadUser()
@@ -28,13 +31,17 @@
 
 </script>
 
-{#if $error !== ""}
-    <div class="error" transition:fade={{duration:500}}>{$error}</div>
-{/if}
-{#if !$user.id}
-    <User />
+{#if !userConnect}
+    Chargement en cours
 {:else}
-    <Tasks />
+    {#if $error !== ""}
+        <div class="error" transition:fade={{duration:500}}>{$error}</div>
+    {/if}
+    {#if !$user.id}
+        <User />
+    {:else}
+        <Tasks />
+    {/if}
 {/if}
 
 <style>
