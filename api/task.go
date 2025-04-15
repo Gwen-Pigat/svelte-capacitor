@@ -23,6 +23,8 @@ var taskSetup = map[string]string{
 	"table":   "task",
 }
 
+const format = "2006-01-02 15:04:05"
+
 func CreateTask(wrapper *Wrapper) {
 	fmt.Printf("Db value is %v", db)
 	if err := wrapper.wrapData("title"); err != nil {
@@ -31,7 +33,7 @@ func CreateTask(wrapper *Wrapper) {
 	}
 	task := Task{
 		Title:   wrapper.data["title"].(string),
-		DateAdd: time.Now().UTC().Truncate(time.Second).String(),
+		DateAdd: time.Now().Local().Truncate(time.Second).Format(format),
 		IsDone:  false,
 		RefUser: wrapper.ReturnUser(),
 	}
@@ -109,7 +111,8 @@ func PatchTask(wrapper *Wrapper) {
 			task.DateTo = ""
 		}
 	}
-	task.DateTo = time.Now().UTC().Truncate(time.Second).String()
+
+	task.DateTo = time.Now().Local().Truncate(time.Second).Format(format)
 	if task.IsDone {
 		task.DateTo = ""
 	}
