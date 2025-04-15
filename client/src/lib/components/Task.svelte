@@ -12,6 +12,7 @@
             return
         }
         task = data.result
+        dateFormat()
     }
 
     async function removeTask(){
@@ -61,7 +62,7 @@
 <article>
     <header>
         {task.title} 
-        {#if task.isDone}{diffLabel}{/if}
+        {#if task.isDone}({diffLabel}){/if}
     </header>
     Ajoutée le {dateAddFormat}
     {#if task.dateTo !== ""}<br />Finie le {dateToFormat}{/if}
