@@ -66,7 +66,11 @@ func GetTasks(wrapper *Wrapper) {
 		}
 		if task.DateTo == "0000-00-00 00:00:00" {
 			task.DateTo = ""
+		} else {
+			task.DateTo = wrapFormat(task.DateTo)
 		}
+		task.DateAdd = wrapFormat(task.DateAdd)
+
 		data = append(data, task)
 	}
 	wrapper.Render(map[string]any{
@@ -126,10 +130,19 @@ func PatchTask(wrapper *Wrapper) {
 		return
 	}
 	defer rows.Close()
+
+	task.DateTo = wrapFormat(task.DateTo)
+
 	wrapper.Render(map[string]any{
 		"message": "Update successfull",
 		"result":  task,
 	})
+}
+
+func wrapFormat(dateStr string) string {
+	loc, _ := time.LoadLocation("Europe/Paris")
+	parsed, _ := time.ParseInLocation(format, dateStr, loc)
+	return parsed.Format(format)
 }
 
 func DeleteTask(wrapper *Wrapper) {
