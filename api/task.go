@@ -33,7 +33,7 @@ func CreateTask(wrapper *Wrapper) {
 	}
 	task := Task{
 		Title:   wrapper.data["title"].(string),
-		DateAdd: time.Now().Local().Truncate(time.Second).Format(format),
+		DateAdd: time.Now().UTC().Truncate(time.Second).Format(format),
 		IsDone:  false,
 		RefUser: wrapper.ReturnUser(),
 	}
@@ -112,7 +112,7 @@ func PatchTask(wrapper *Wrapper) {
 		}
 	}
 
-	task.DateTo = time.Now().Local().Truncate(time.Second).Format(format)
+	task.DateTo = time.Now().UTC().Truncate(time.Second).Format(format)
 	if task.IsDone {
 		task.DateTo = ""
 	}
