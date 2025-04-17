@@ -117,7 +117,7 @@ func CreateUser(wrapper *Wrapper) {
 	defer smtp.Close()
 	user := User{
 		Username: wrapper.data["username"].(string),
-		DateAdd:  time.Now().UTC().Truncate(time.Second).String(),
+		DateAdd:  time.Now().UTC().Truncate(time.Second).Format(format),
 		IsActive: true,
 		Token:    uuid.New().String(),
 	}
