@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS ` + "`task`" + ` (
   ` + "`id`" + ` int NOT NULL AUTO_INCREMENT,
   ` + "`date_add`" + ` datetime NOT NULL,
-  ` + "`date_to`" + ` datetime NOT NULL,
+  ` + "`date_to`" + ` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   ` + "`title`" + ` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   ` + "`content`" + ` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   ` + "`is_done`" + ` tinyint(1) NOT NULL,

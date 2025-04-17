@@ -115,7 +115,6 @@ func PatchTask(wrapper *Wrapper) {
 			task.DateTo = ""
 		}
 	}
-
 	task.DateTo = time.Now().UTC().Truncate(time.Second).Format(format)
 	if task.IsDone {
 		task.DateTo = ""
@@ -131,7 +130,9 @@ func PatchTask(wrapper *Wrapper) {
 	}
 	defer rows.Close()
 
-	task.DateTo = wrapFormat(task.DateTo)
+	if task.DateTo != "" {
+		task.DateTo = wrapFormat(task.DateTo)
+	}
 
 	wrapper.Render(map[string]any{
 		"message": "Update successfull",
