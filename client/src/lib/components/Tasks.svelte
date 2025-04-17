@@ -21,11 +21,11 @@
 </script>
 
 <button type="button" 
-class="action outline" 
+class="action outline secondary" 
 onclick={resetUser}>
     Disconnect
 </button>
-<h1>Bienvenue {$user.username}</h1>
+<h1>Welcome {$user.username}</h1>
 <TaskAdd />
 {#if $tasks.length > 0}
     {#each $tasks as task}

@@ -4,10 +4,12 @@
     import { onMount } from "svelte";
 
     let { task } = $props()
-
+    let isSubmit:boolean = $state(false)
 
     async function patchTask(){
+        isSubmit = true
         const data = await fetchAPI(`/tasks/${task.id}`, "PATCH")
+        isSubmit = false
         if(data.error){
             return
         }
@@ -16,7 +18,9 @@
     }
 
     async function removeTask(){
+        isSubmit = true
         const data = await fetchAPI(`/tasks/${task.id}`, "DELETE")
+        isSubmit = false
         if(data.error){
             return
         }
@@ -32,27 +36,34 @@
             return
         }
         dateTo = new Date(task.dateTo)
-        dateToFormat = dateTo.getDate()+"/"+dateTo.getMonth()+"/"+dateTo.getFullYear()+" "+dateTo.getHours()+":"+dateTo.getMinutes()
+        dateToFormat = dateTo.getDate()+"/"+dateTo.getMonth()+"/"+dateTo.getFullYear()+" "+dateTo.getHours()+":"+dateTo.getMinutes()+":"+dateTo.getSeconds()
         const diffMs = dateTo.getTime() - dateAdd.getTime()
-        const diffMins  = Math.floor(diffMs / 60000)
-        const hours = Math.floor(diffMins / 60)
-        const minutes = diffMins % 60
+        const diffSecs  = Math.floor(diffMs / 1000)
+        const hours = Math.floor(diffSecs / 3600)
+        const minutes = Math.floor(diffSecs / 60)
+        const seconds = diffSecs % 60
 
-        diffLabel = "Finie en "
+        console.log(seconds)
+
+        diffLabel = "Done in "
         if(hours > 0){
-            diffLabel += hours+" heure"
+            diffLabel += hours+" hour"
             if(hours > 1) diffLabel += "s"
-            if(minutes > 0) diffLabel +=" et "
+            if(minutes > 0 || seconds > 0) diffLabel +=" et "
         }
         if(minutes > 0){
             diffLabel += minutes+" minute"
             if(minutes > 1) diffLabel += "s"
+            if(seconds > 0) diffLabel += " et "
         }
-
+        if(seconds > 0){
+            diffLabel += seconds+" second"
+            if(seconds > 1) diffLabel += "s"
+        }
     }
 
     const dateAdd = new Date(task.dateAdd)
-    const dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()
+    const dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()+":"+dateAdd.getSeconds()
 
     onMount(() => {
         dateFormat()
@@ -65,12 +76,16 @@
         {task.title} 
         {#if task.isDone}({diffLabel}){/if}
     </header>
-    Ajoutée le {dateAddFormat}
-    {#if task.dateTo !== null}<br />Finie le {dateToFormat}{/if}
-    <footer>
-        <button class="secondary" onclick={patchTask}>
-            {#if task.dateTo}Annuler{:else}Finir{/if}
+    Add on {dateAddFormat}
+    {#if task.dateTo !== null}<br />Done the {dateToFormat}{/if}
+    <footer role="group">
+        <button class="secondary" 
+        onclick={patchTask} 
+        disabled={isSubmit === true}>
+            {#if task.dateTo}Cancel{:else}Finish{/if}
         </button>
-        <button class="outline secondary" onclick={removeTask}>Supprimer</button>
+        <button class="outline secondary" 
+        onclick={removeTask} 
+        disabled={isSubmit === true}>Delete</button>
     </footer>
 </article>
