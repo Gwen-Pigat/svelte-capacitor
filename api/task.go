@@ -22,6 +22,7 @@ var taskSetup = map[string]string{
 	"payload": "id,date_add,date_to,title,content,is_done,ref_user",
 	"table":   "task",
 }
+var locParis = time.FixedZone("CEST", 2*60*60)
 
 const format = "2006-01-02 15:04:05"
 
@@ -151,15 +152,11 @@ func PatchTask(wrapper *Wrapper) {
 }
 
 func wrapFormat(dateStr *string) (string, error) {
-	loc, err := time.LoadLocation("Europe/Paris")
+	parsed, err := time.ParseInLocation(format, *dateStr, time.UTC)
 	if err != nil {
 		return "", err
 	}
-	parsed, err := time.ParseInLocation(format, *dateStr, loc)
-	if err != nil {
-		return "", err
-	}
-	return parsed.Format(format), nil
+	return parsed.In(locParis).Format(format), nil
 }
 
 func DeleteTask(wrapper *Wrapper) {
