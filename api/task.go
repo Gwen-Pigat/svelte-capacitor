@@ -13,7 +13,7 @@ type Task struct {
 	Title   string  `json:"title"`
 	DateAdd *string `json:"dateAdd"`
 	DateTo  *string `json:"dateTo"`
-	Content string  `json:"content"`
+	Content *string `json:"content"`
 	IsDone  bool    `json:"isDone"`
 	RefUser int     `json:"refUser"`
 }

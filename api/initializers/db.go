@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ` + "`task`" + ` (
   ` + "`date_add`" + ` datetime DEFAULT NULL,
   ` + "`date_to`" + ` datetime DEFAULT NULL,
   ` + "`title`" + ` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  ` + "`content`" + ` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  ` + "`content`" + ` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   ` + "`is_done`" + ` tinyint(1) NOT NULL,
   ` + "`ref_user`" + ` int DEFAULT NULL,
   PRIMARY KEY (` + "`id`" + `),
