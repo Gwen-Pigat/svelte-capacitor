@@ -9,13 +9,13 @@ import (
 )
 
 type Task struct {
-	ID      int    `json:"id"`
-	Title   string `json:"title"`
-	DateAdd string `json:"dateAdd"`
-	DateTo  string `json:"dateTo"`
-	Content string `json:"content"`
-	IsDone  bool   `json:"isDone"`
-	RefUser int    `json:"refUser"`
+	ID      int     `json:"id"`
+	Title   string  `json:"title"`
+	DateAdd *string `json:"dateAdd"`
+	DateTo  *string `json:"dateTo"`
+	Content string  `json:"content"`
+	IsDone  bool    `json:"isDone"`
+	RefUser int     `json:"refUser"`
 }
 
 var taskSetup = map[string]string{
@@ -25,6 +25,10 @@ var taskSetup = map[string]string{
 
 const format = "2006-01-02 15:04:05"
 
+func stringPtr(s string) *string {
+	return &s
+}
+
 func CreateTask(wrapper *Wrapper) {
 	fmt.Printf("Db value is %v", db)
 	if err := wrapper.wrapData("title"); err != nil {
@@ -33,9 +37,9 @@ func CreateTask(wrapper *Wrapper) {
 	}
 	task := Task{
 		Title:   wrapper.data["title"].(string),
-		DateAdd: time.Now().UTC().Truncate(time.Second).Format(format),
 		IsDone:  false,
 		RefUser: wrapper.ReturnUser(),
+		DateAdd: stringPtr(time.Now().UTC().Truncate(time.Second).Format(format)),
 	}
 	smtp, err := db.Prepare("INSERT INTO " + taskSetup["table"] + "(title,date_add,is_done,ref_user) VALUES(?,?,?,?)")
 	if err != nil {
@@ -64,12 +68,10 @@ func GetTasks(wrapper *Wrapper) {
 			wrapper.Error(err.Error(), http.StatusBadGateway)
 			return
 		}
-		if task.DateTo == "0000-00-00 00:00:00" {
-			task.DateTo = ""
-		} else {
-			task.DateTo = wrapFormat(task.DateTo)
+		if task.DateTo != nil {
+			*task.DateTo = wrapFormat(task.DateTo)
 		}
-		task.DateAdd = wrapFormat(task.DateAdd)
+		*task.DateAdd = wrapFormat(task.DateAdd)
 
 		data = append(data, task)
 	}
@@ -90,8 +92,8 @@ func GetTask(wrapper *Wrapper) {
 			wrapper.Error(err.Error(), http.StatusBadGateway)
 			return
 		}
-		if task.DateTo == "0000-00-00 00:00:00" {
-			task.DateTo = ""
+		if task.DateTo == nil {
+			*task.DateTo = ""
 		}
 	}
 	wrapper.Render(map[string]any{
@@ -111,13 +113,10 @@ func PatchTask(wrapper *Wrapper) {
 			wrapper.Error(err.Error(), http.StatusBadGateway)
 			return
 		}
-		if task.DateTo == "0000-00-00 00:00:00" {
-			task.DateTo = ""
-		}
 	}
-	task.DateTo = time.Now().UTC().Truncate(time.Second).Format(format)
-	if task.IsDone {
-		task.DateTo = ""
+	task.DateTo = nil
+	if !task.IsDone {
+		task.DateTo = stringPtr(time.Now().UTC().Truncate(time.Second).Format(format))
 	}
 	task.IsDone = !task.IsDone
 	rows, err = db.Query(
@@ -130,8 +129,8 @@ func PatchTask(wrapper *Wrapper) {
 	}
 	defer rows.Close()
 
-	if task.DateTo != "" {
-		task.DateTo = wrapFormat(task.DateTo)
+	if task.DateTo != nil {
+		*task.DateTo = wrapFormat(task.DateTo)
 	}
 
 	wrapper.Render(map[string]any{
@@ -140,9 +139,9 @@ func PatchTask(wrapper *Wrapper) {
 	})
 }
 
-func wrapFormat(dateStr string) string {
+func wrapFormat(dateStr *string) string {
 	loc, _ := time.LoadLocation("Europe/Paris")
-	parsed, _ := time.ParseInLocation(format, dateStr, loc)
+	parsed, _ := time.ParseInLocation(format, *dateStr, loc)
 	return parsed.Format(format)
 }
 

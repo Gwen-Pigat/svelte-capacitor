@@ -46,6 +46,7 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+	Handle(r, http.MethodGet, "/db/flush", FlushDB)
 	Handle(r, http.MethodPost, "/user/connect", GetUserConnect)
 	Handle(r, http.MethodPost, "/user", CreateUser)
 	r.Group(func(r chi.Router) {
@@ -57,6 +58,17 @@ func main() {
 		Handle(r, http.MethodDelete, "/tasks/{id}", DeleteTask)
 	})
 	http.ListenAndServe(":"+port, r)
+}
+
+func FlushDB(wrapper *Wrapper) {
+	err := initializers.ExecFlushDB(db)
+	if err != nil {
+		wrapper.Error(err.Error())
+		return
+	}
+	wrapper.Render(map[string]any{
+		"message": "DB is flushed",
+	})
 }
 
 func CheckAuth(handler http.Handler) http.Handler {

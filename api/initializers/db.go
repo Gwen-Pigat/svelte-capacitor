@@ -25,8 +25,8 @@ func SetupDB(db *sql.DB) error {
 SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS ` + "`task`" + ` (
   ` + "`id`" + ` int NOT NULL AUTO_INCREMENT,
-  ` + "`date_add`" + ` datetime NOT NULL,
-  ` + "`date_to`" + ` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  ` + "`date_add`" + ` datetime DEFAULT NULL,
+  ` + "`date_to`" + ` datetime DEFAULT NULL,
   ` + "`title`" + ` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   ` + "`content`" + ` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   ` + "`is_done`" + ` tinyint(1) NOT NULL,
@@ -44,6 +44,17 @@ CREATE TABLE IF NOT EXISTS ` + "`user`" + ` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;`
 	_, err := db.Exec(dbInit)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ExecFlushDB(db *sql.DB) error {
+	dbQuery := "DROP TABLE task;DROP TABLE user"
+	if _, err := db.Exec(dbQuery); err != nil {
+		return err
+	}
+	if err := SetupDB(db); err != nil {
 		return err
 	}
 	return nil
