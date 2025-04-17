@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'svelte.mobile.app',
-  appName: 'mobile',
+  appId: 'tasker.mobile.app',
+  appName: 'Tasker',
   webDir: 'build'
 };
 
