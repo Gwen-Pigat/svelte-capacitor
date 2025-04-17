@@ -2,10 +2,35 @@
 :root{
     --white: #ffffff;
     --red: #ff0000;
+    --pico-primary: #ef4736 !important;
+    --pico-primary-background: rgb(206, 47, 29);
+    --pico-primary-border: #ef4736;
+    --pico-primary-underline: rgba(1, 170, 255, 0.5);
+    --pico-primary-hover: #79c0ff;
+    --pico-primary-hover-background: #017fc0;
+    --pico-primary-hover-border: var(--pico-primary-hover-background);
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+    --pico-primary-focus: rgba(1, 170, 255, 0.375);
+    --pico-primary-inverse: #fff;
 }
 
 button.action{
     position: absolute;
     top:0;
     right:0;
+}
+
+img.logo{
+    display: flex;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+h1{
+    text-align: center;
+}
+
+main{
+    margin-top: 4rem;
+    position: relative;
 }

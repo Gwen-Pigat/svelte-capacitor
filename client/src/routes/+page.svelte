@@ -31,6 +31,7 @@
 
 </script>
 
+<img class="logo" src="/images/logo.svg" alt="Tasker Logo" />
 {#if !userConnect}
     Chargement en cours
 {:else}
