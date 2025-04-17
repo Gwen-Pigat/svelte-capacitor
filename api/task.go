@@ -69,10 +69,17 @@ func GetTasks(wrapper *Wrapper) {
 			return
 		}
 		if task.DateTo != nil {
-			*task.DateTo = wrapFormat(task.DateTo)
+			*task.DateTo, err = wrapFormat(task.DateTo)
+			if err != nil {
+				wrapper.Error("Error parsing dateTp : " + err.Error())
+				return
+			}
 		}
-		*task.DateAdd = wrapFormat(task.DateAdd)
-
+		*task.DateAdd, err = wrapFormat(task.DateAdd)
+		if err != nil {
+			wrapper.Error("Error parsing dateAdd : " + err.Error())
+			return
+		}
 		data = append(data, task)
 	}
 	wrapper.Render(map[string]any{
@@ -130,7 +137,11 @@ func PatchTask(wrapper *Wrapper) {
 	defer rows.Close()
 
 	if task.DateTo != nil {
-		*task.DateTo = wrapFormat(task.DateTo)
+		*task.DateTo, err = wrapFormat(task.DateTo)
+		if err != nil {
+			wrapper.Error("Error parsing dateTo inside PATCH : " + err.Error())
+			return
+		}
 	}
 
 	wrapper.Render(map[string]any{
@@ -139,10 +150,16 @@ func PatchTask(wrapper *Wrapper) {
 	})
 }
 
-func wrapFormat(dateStr *string) string {
-	loc, _ := time.LoadLocation("Europe/Paris")
-	parsed, _ := time.ParseInLocation(format, *dateStr, loc)
-	return parsed.Format(format)
+func wrapFormat(dateStr *string) (string, error) {
+	loc, err := time.LoadLocation("Europe/Paris")
+	if err != nil {
+		return "", err
+	}
+	parsed, err := time.ParseInLocation(format, *dateStr, loc)
+	if err != nil {
+		return "", err
+	}
+	return parsed.Format(format), nil
 }
 
 func DeleteTask(wrapper *Wrapper) {
