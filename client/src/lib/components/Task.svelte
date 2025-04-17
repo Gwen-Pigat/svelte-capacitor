@@ -28,6 +28,9 @@
     let diffLabel:string = $state("")
 
     function dateFormat(){
+        if(task.dateTo === null){
+            return
+        }
         dateTo = new Date(task.dateTo)
         dateToFormat = dateTo.getDate()+"/"+dateTo.getMonth()+"/"+dateTo.getFullYear()+" "+dateTo.getHours()+":"+dateTo.getMinutes()
         const diffMs = dateTo.getTime() - dateAdd.getTime()
@@ -52,9 +55,7 @@
     const dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()
 
     onMount(() => {
-        if(task.dateTo !== ""){
-            dateFormat()
-        }
+        dateFormat()
     })
 
 </script>
@@ -65,7 +66,7 @@
         {#if task.isDone}({diffLabel}){/if}
     </header>
     Ajoutée le {dateAddFormat}
-    {#if task.dateTo !== ""}<br />Finie le {dateToFormat}{/if}
+    {#if task.dateTo !== null}<br />Finie le {dateToFormat}{/if}
     <footer>
         <button class="secondary" onclick={patchTask}>
             {#if task.dateTo}Annuler{:else}Finir{/if}
