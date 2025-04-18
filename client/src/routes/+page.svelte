@@ -33,7 +33,7 @@
 
 <img class="logo" src="/images/logo.svg" alt="Tasker Logo" />
 {#if !userConnect}
-    Chargement en cours
+    <progress></progress>
 {:else}
     {#if $error !== ""}
         <div class="error" transition:fade={{duration:500}}>{$error}</div>

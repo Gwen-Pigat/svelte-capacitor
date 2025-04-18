@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { tasks,user } from "$lib"
     import { onMount } from "svelte";
     import Task from "./Task.svelte";
@@ -6,8 +6,12 @@
     import { fetchAPI, resetUser } from "$lib/_core";
 
 
+    let isFetching:boolean = false
+
     async function loadTasks(){
+        isFetching = true
         const dataFetch = await fetchAPI("/tasks", "GET")
+        isFetching = false
         if(dataFetch.error){
             return
         }
@@ -31,6 +35,8 @@ onclick={resetUser}>
     {#each $tasks as task}
         <Task {task} />
     {/each}
+{:else if isFetching}
+    <progress></progress>
 {:else}
     <p>No tasks available.</p>
 {/if}
