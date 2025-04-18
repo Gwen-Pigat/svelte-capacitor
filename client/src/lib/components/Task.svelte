@@ -39,8 +39,11 @@
         dateToFormat = dateTo.getDate()+"/"+dateTo.getMonth()+"/"+dateTo.getFullYear()+" "+dateTo.getHours()+":"+dateTo.getMinutes()+":"+dateTo.getSeconds()
         const diffMs = dateTo.getTime() - dateAdd.getTime()
         const diffSecs  = Math.floor(diffMs / 1000)
-        const hours = Math.floor(diffSecs / 3600)
-        const minutes = Math.floor(diffSecs / 60)
+        const diffMinutes = Math.floor(diffSecs / 60)
+        const hours = Math.floor(diffMinutes / 60)
+
+
+        const minutes = diffMinutes % 60
         const seconds = diffSecs % 60
 
         console.log(seconds)
@@ -62,8 +65,13 @@
         }
     }
 
-    const dateAdd = new Date(task.dateAdd)
-    const dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()+":"+dateAdd.getSeconds()
+    let dateAdd:any
+    let dateAddFormat:any = $state("")
+
+    $effect(() => {
+        dateAdd = new Date(task.dateAdd)
+        dateAddFormat = dateAdd.getDate()+"/"+dateAdd.getMonth()+"/"+dateAdd.getFullYear()+" "+dateAdd.getHours()+":"+dateAdd.getMinutes()+":"+dateAdd.getSeconds()
+    })
 
     onMount(() => {
         dateFormat()
