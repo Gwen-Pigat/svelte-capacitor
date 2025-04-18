@@ -1,5 +1,6 @@
 import { Preferences } from '@capacitor/preferences'
-import { user,error, API_URL } from '$lib'
+import { user,error } from '$lib'
+import { env } from '$env/dynamic/public'
 
 
 export async function resetUser(){
@@ -27,7 +28,7 @@ export async function fetchAPI(
         options.body = data
     }
     try{
-        const response = await fetch(API_URL+path, options)
+        const response = await fetch(env.PUBLIC_API_URL+path, options)
         result = await response.json()
         if(!response.ok){
             if(response.status === 401){
