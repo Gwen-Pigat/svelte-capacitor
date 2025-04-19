@@ -2,6 +2,7 @@
 :root{
     --white: #ffffff;
     --red: #ff0000;
+    --yellow: #f9a03e;
     --pico-primary: #ef4736 !important;
     --pico-primary-background: rgb(206, 47, 29);
     --pico-primary-border: #ef4736;
@@ -20,6 +21,17 @@ button.action{
     right: 15px;
 }
 
+button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+button svg{
+    margin-right: 0.5rem;
+    width: 15px;
+    height: 15px;
+}
+
 img.logo{
     display: flex;
     width: 100%;
@@ -28,6 +40,7 @@ img.logo{
 
 h1{
     text-align: center;
+    color: var(--pico-primary);
 }
 
 main{
