@@ -5,6 +5,7 @@
     import Tasks from '$lib/components/Tasks.svelte';
     import User from '$lib/components/User.svelte';
     import { fade } from 'svelte/transition';
+    import Loader from '$lib/components/Loader.svelte';
 
     async function loadUser(){
         const data = await fetchAPI("/user","GET")
@@ -31,6 +32,7 @@
 
 </script>
 
+<Loader />
 <img class="logo" src="/images/logo.svg" alt="Tasker Logo" />
 {#if !userConnect}
     <progress></progress>
