@@ -33,7 +33,9 @@ onclick={resetUser}>
 <TaskAdd />
 {#if $tasks.length > 0}
     {#each $tasks as task}
-        <Task {task} />
+        {#if !task.isDeleted}
+            <Task bind:task />
+        {/if}
     {/each}
 {:else if isFetching}
     <progress></progress>

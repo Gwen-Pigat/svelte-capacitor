@@ -3,7 +3,7 @@
     import { fetchAPI } from "$lib/_core";
     import { onMount } from "svelte";
 
-    let { task } = $props()
+    let { task = $bindable() } = $props()
     let isSubmit:boolean = $state(false)
 
     async function patchTask(){
@@ -24,7 +24,7 @@
         if(data.error){
             return
         }
-        tasks.update((list: { id: string; isDone: boolean; title: string }[]) => list.filter((t) => t.id !== task.id))
+        task.isDeleted = true
     }
 
     let dateTo:Date
