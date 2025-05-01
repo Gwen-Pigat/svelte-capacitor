@@ -34,8 +34,15 @@ button svg{
 
 img.logo{
     display: flex;
-    width: 100%;
-    margin: 2rem 0;
+    max-width: 550px;
+    margin: 2rem auto;
+    width: -webkit-fill-available;
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 768px;
+    }
 }
 
 h1{
