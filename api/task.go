@@ -144,7 +144,11 @@ func PatchTask(wrapper *Wrapper) {
 			return
 		}
 	}
-
+	*task.DateAdd, err = wrapFormat(task.DateAdd)
+	if err != nil {
+		wrapper.Error("Error parsing dateTo inside PATCH : " + err.Error())
+		return
+	}
 	wrapper.Render(map[string]any{
 		"message": "Update successfull",
 		"result":  task,
