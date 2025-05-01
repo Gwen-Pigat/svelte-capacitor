@@ -57,7 +57,7 @@ func CreateTask(wrapper *Wrapper) {
 }
 
 func GetTasks(wrapper *Wrapper) {
-	rows, err := db.Query("SELECT "+taskSetup["payload"]+" FROM "+taskSetup["table"]+" WHERE ref_user=? ORDER BY date_add DESC", wrapper.ReturnUser())
+	rows, err := db.Query("SELECT "+taskSetup["payload"]+" FROM "+taskSetup["table"]+" WHERE ref_user=? ORDER BY date_add DESC LIMIT 15", wrapper.ReturnUser())
 	if err != nil {
 		wrapper.Error(err.Error(), http.StatusInternalServerError)
 		return
